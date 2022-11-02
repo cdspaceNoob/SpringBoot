@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mini_pro?serverTimezone=Asia/Seoul
+    username: root
+    password: Abc1234!
+    
