@@ -11,11 +11,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController	// com.moon.blog 패키지 이하를 스캔, 특정 어노테이션이 선언된 클래스를 new 생성자로 스프링 컨테이너에 넣어서 관리해준다.(IoC)
 public class TestController {
 
+	private static final String TAG = "TestController: ";
 	
 	@GetMapping("/test/hello")
 	public String hello() {
 		return "<h1>hello Spring Boot</h1>";
 	}//
+
+	@GetMapping("/http/lombok")
+	public String lombokTest() {
+//		Member member = new Member(1, "sir", "1234", "email");
+		Member member = Member.builder().username("sir").password("1234").email("email.com").build();
+		System.out.println(TAG+"getter: " + member.getUsername());
+		member.setUsername("moon");
+		System.out.println(TAG+"getter: " + member.getUsername());
+		return "lombok test 완료";
+	}
 	
 //	http:localhost:8080/http/get
 	@GetMapping("/http/get")
