@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +14,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +29,36 @@ public class DummyContoller {
 	@Autowired	// DummyController가 사용될 때, 아래의 객체도 함께 생성되어 사용된다. (의존성 주입)
 	private UserRepository userRepository;
 	
+	// detail 함수와 url은 동일하지만 요청 방식이 다르므로 알아서 구별한다.(REST)
+	// email, password를 수정할 수 있도록 구현.
+	
+	@Transactional
+	@PutMapping("/dummy/user/{id}")
+//	public User updateUser(@PathVariable int id, User requestUser) {	// 이렇게 받으면 form 태그의 summit으로 들어오는 데이터만 받을 수 있다.
+	public User updateUser(@PathVariable int id, @RequestBody User requestUser) {	// JSON 데이터를 받으려면 @RequestBody를 써줘야 한다.	
+		// JSON 데이터로 요청이 들어오면 MessageConverter의 Jackson lib이 사용되어 Java Obj로 변환되어 들어온다. 
+		System.out.println("id: " + id);
+		System.out.println("password: " + requestUser.getPassword());
+		System.out.println("email: " + requestUser.getEmail());
+		
+//		requestUser.setId(id);
+//		requestUser.setUsername("edited");
+//		userRepository.save(requestUser);
+		
+		// save()로 update할 때는 다음과 같이 코드를 짠다.
+		// 일단 findById()로 찾아라 그런데 없으면 orElseThrow() 실행해라.
+		// 람다 사용한다.
+		User user = userRepository.findById(id).orElseThrow(()->{
+			return new IllegalArgumentException("수정에 실패했습니다.");
+		});
+		
+		user.setPassword(requestUser.getPassword());
+		user.setEmail(requestUser.getEmail());
+		
+//		userRepository.save(user);
+		return null;
+	}
+	
 	// http://localhost:8000/blog/dummy/user/
 	@GetMapping("/dummy/users")
 	public List<User> list(){
@@ -37,6 +71,10 @@ public class DummyContoller {
 //		Page<User> users = userRepository.findAll(pageable);
 //		List<User> users = userRepository.findAll(pageable).getContent();
 		Page<User> pagingUser = userRepository.findAll(pageable);
+		
+		if(pagingUser.isFirst()) {
+			// 이런 부가적인 분기 처리를 위해서 Page 객체로 받고, 원하는 내용 처리를 실행한 후 return 해주면 짜임이 좋다.
+		}
 		List<User> users = pagingUser.getContent();
 		return users;
 	}
