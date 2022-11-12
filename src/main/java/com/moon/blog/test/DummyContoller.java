@@ -7,10 +7,12 @@ import java.util.function.Supplier;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +25,8 @@ import com.moon.blog.model.RoleType;
 import com.moon.blog.model.User;
 import com.moon.blog.repository.UserRepository;
 
+import lombok.Delegate;
+
 @RestController
 public class DummyContoller {
 	
@@ -31,8 +35,17 @@ public class DummyContoller {
 	
 	// detail 함수와 url은 동일하지만 요청 방식이 다르므로 알아서 구별한다.(REST)
 	// email, password를 수정할 수 있도록 구현.
+	@DeleteMapping("/dummy/user/{id}")
+	public String delete(@PathVariable int id) {
+		try {
+			userRepository.deleteById(id);
+		} catch (EmptyResultDataAccessException e) {
+			return "삭제에 실패했습니다. 존재하지 않는 아이디입니다.";
+		}
+		return id + "는 삭제되었습니다";
+	}
 	
-	@Transactional
+	@Transactional	// 함수 종료 시 자동으로 commit.
 	@PutMapping("/dummy/user/{id}")
 //	public User updateUser(@PathVariable int id, User requestUser) {	// 이렇게 받으면 form 태그의 summit으로 들어오는 데이터만 받을 수 있다.
 	public User updateUser(@PathVariable int id, @RequestBody User requestUser) {	// JSON 데이터를 받으려면 @RequestBody를 써줘야 한다.	
@@ -48,15 +61,15 @@ public class DummyContoller {
 		// save()로 update할 때는 다음과 같이 코드를 짠다.
 		// 일단 findById()로 찾아라 그런데 없으면 orElseThrow() 실행해라.
 		// 람다 사용한다.
-		User user = userRepository.findById(id).orElseThrow(()->{
+		User user = userRepository.findById(id).orElseThrow(()->{		// findById()로 들고온 데이터는 영속화된다. 
 			return new IllegalArgumentException("수정에 실패했습니다.");
 		});
 		
-		user.setPassword(requestUser.getPassword());
+		user.setPassword(requestUser.getPassword());							// 영속화된 데이터의 value를 setter로 변경한다.
 		user.setEmail(requestUser.getEmail());
 		
 //		userRepository.save(user);
-		return null;
+		return null;																			// commit.
 	}
 	
 	// http://localhost:8000/blog/dummy/user/
