@@ -32,7 +32,7 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)		// 프로젝트에 연결된 DB 넘버링 전략을 따라간다.
 	private int id;													// Orace: sequence로 처리, MySQL: auto_increment로 처리.
 	
-	@Column(nullable = false, length = 30)			// null이 될 수 없음을 의미, 최대 30글자를 넘을 수 없다. 
+	@Column(nullable = false, length = 30,  unique=true)			// null이 될 수 없음을 의미, 최대 30글자를 넘을 수 없다. unique는 고윳값임을 의미한다. 중복 불허. 
 	private String username;	
 	
 	@Column(nullable = false, length = 100)			// 왜 100이나 주는가? 이후에 Hash로 변환하여 암호화하기 위해서다. 따라서 넉넉하게 100 준다. 
