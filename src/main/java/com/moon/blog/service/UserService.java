@@ -15,15 +15,16 @@ public class UserService {
 		private UserRepository userRepository;
 		
 		@Transactional	// 아래의 로직들을 하나의 트랜잭션으로 묶어준다. 
-		public Integer 회원가입(User user) {
-			try {
-				userRepository.save(user);
-				return 1;
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.out.println("UserService: 회원가입(): " + e.getMessage());
-			}
-			return -1;
-		}//
+		public void 회원가입(User user) {
+			userRepository.save(user);
+//			try {
+//				userRepository.save(user);
+//				return 1;
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				System.out.println("UserService: 회원가입(): " + e.getMessage());
+//			}
+//			return -1;
+		}// 여기서 오류가 발생하면 GlobalExceptionHandler에서 처리할 것이므로 다른 코드가 필요하지 않다. 
 		
 }

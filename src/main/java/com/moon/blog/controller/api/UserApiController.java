@@ -22,8 +22,9 @@ public class UserApiController {
 		System.out.println("UserApiController: save() 메서드 호출.");
 		// 실제로 DB에 insert하고 return하는 코드 작성.
 		user.setRole(RoleType.USER);
-		int result = userService.회원가입(user);
-		return new ResponseDto<Integer>(HttpStatus.OK, result);
+//		int result = userService.회원가입(user);
+		userService.회원가입(user);
+		return new ResponseDto<Integer>(HttpStatus.OK.value(), 1);		// JavaOBJ를 JSON으로 변환하여 return.(MessageConverter - Jackson)
 	}
 	
 	
