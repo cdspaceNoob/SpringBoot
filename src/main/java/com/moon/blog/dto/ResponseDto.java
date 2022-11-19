@@ -13,9 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ResponseDto<T>{
 	
-	public ResponseDto(int value, int data2) {
-		// TODO Auto-generated constructor stub
-	}
 	int status;
 	T data;
 
